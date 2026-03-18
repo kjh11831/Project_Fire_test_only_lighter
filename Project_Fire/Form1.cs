@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FireSharp.Config;
+using FireSharp.Interfaces;
+using FireSharp.Response;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,9 +11,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using FireSharp.Response;
+using static Project_Fire.Form2;
 
 namespace Project_Fire
 {
@@ -23,20 +24,20 @@ namespace Project_Fire
         public Form1()
         {
             InitializeComponent();
-            button1.Click += button1_Click_1;
+            button1.Click += button1_Click;
         }
 
-        IFeatureSupport irebaseConfig = new FirebaseConfig
+        IFirebaseConfig Config = new FirebaseConfig
         {
-            AuthSecret = "",
-            BasePath = ""
+            AuthSecret = "6zja7ZvLbRxEuuTmvulUobmmelYMVnWHWz8g4fCp",
+            BasePath = "https://projectfire-e50e7-default-rtdb.firebaseio.com/"
         };
 
         private async void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                client = new FireSharp.FirebaseClient(config);
+                client = new FireSharp.FirebaseClient(Config);
 
                 if (client == null)
                 {
@@ -52,21 +53,26 @@ namespace Project_Fire
                 {
                     SensorData arduino1Data = response1.ResultAs<SensorData>();
                     SensorData arduino2Data = response2.ResultAs<SensorData>();
-                }
 
-                if (arduino1Data != null && arduino2Data != null)
-                {
-                    if (form2 == null || form2.IsDisposed)
+                    if (arduino1Data != null && arduino2Data != null)
                     {
-                        form2 = new Form2();
-                        form2.Show();
+                        if (form2 == null || form2.IsDisposed)
+                        {
+                            form2 = new Form2();
+                            form2.Show();
+                        }
+
+                        // Form2가 로드된 후에 데이터를 전달
+                        form2.Load += (s, args) =>
+                        {
+                            form2.DisplaySensorData(arduino1Data, arduino2Data);
+                        };
                     }
 
-                    // Form2가 로드된 후에 데이터를 전달
-                    form2.Load += (s, args) =>
+                    else
                     {
-                        form2.DisplaySensorData(arduino1Data, arduino2Data);
-                    };
+                        MessageBox.Show("데이터를 불러오는 데 실패했습니다.");
+                    }
                 }
 
                 else
@@ -75,16 +81,10 @@ namespace Project_Fire
                 }
             }
 
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("데이터를 불러오는 데 실패했습니다.");
-            }
-        }
-
-        catch (Exception ex)
-        {
                 MessageBox.Show($"오류 발생: {ex.Message}");
             }
         }
-        }
+    }
 }

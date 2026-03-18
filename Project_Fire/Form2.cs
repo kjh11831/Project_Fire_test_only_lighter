@@ -4,6 +4,7 @@ using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
 using System.Timers;
+using System.Linq.Expressions;
 
 namespace Project_Fire
 {
@@ -35,14 +36,15 @@ namespace Project_Fire
 
             client = new FireSharp.FirebaseClient(new FirebaseConfig
             {
-                AuthSecret = "",
-                BasePath = ""
+                AuthSecret = "6zja7ZvLbRxEuuTmvulUobmmelYMVnWHWz8g4fCp",
+                BasePath = "https://projectfire-e50e7-default-rtdb.firebaseio.com"
             });
 
             if (client != null)
             {
                 MessageBox.Show("Firebase 연결 성공!");
             }
+
             else
             {
                 MessageBox.Show("Firebase 연결 실패!");
@@ -139,7 +141,6 @@ namespace Project_Fire
                         {
                             labelArduino1.Text = $"801호\nCO2: {double.Parse(arduino1Data.CO2):F1} ppm\nTemp: {double.Parse(arduino1Data.Temperature):F1} °C\nFlame: {(arduino1Data.Flame == "1" ? "불꽃 감지 없음" : "불꽃 감지!!")}";
                             labelArduino2.Text = $"802호\nCO2: {double.Parse(arduino2Data.CO2):F1} ppm\nTemp: {double.Parse(arduino2Data.Temperature):F1} °C\nFlame: {(arduino2Data.Flame == "1" ? "불꽃 감지 없음" : "불꽃 감지!!")}";
-
                             textBoxFire1.Text = fireDetected1 ? "화재가 발생했습니다!" : "화재가 감지되지 않았습니다";
                             textBoxFire2.Text = fireDetected2 ? "화재가 발생했습니다!" : "화재가 감지되지 않았습니다";
                         });
@@ -154,7 +155,6 @@ namespace Project_Fire
                     });
                 }
             }
-
             catch (Exception ex)
             {
                 this.Invoke((MethodInvoker)delegate
@@ -180,19 +180,18 @@ namespace Project_Fire
                         C802.BackColor = co2Value2 >= 800 ? System.Drawing.Color.Red : System.Drawing.Color.Green;
                         T801.BackColor = tempValue1 >= 60 ? System.Drawing.Color.Red : System.Drawing.Color.Green;
                         T802.BackColor = tempValue2 >= 60 ? System.Drawing.Color.Red : System.Drawing.Color.Green;
-
                         labelArduino1.Text = $"801호\nCO2: {co2Value1:F1} ppm\nTemp: {tempValue1:F1} °C\nFlame: {(arduino1Data.Flame == "1" ? "화재 감지!!" : "화재 감지 없음")}";
                         labelArduino2.Text = $"802호\nCO2: {co2Value2:F1} ppm\nTemp: {tempValue2:F1} °C\nFlame: {(arduino2Data.Flame == "1" ? "화재 감지!!" : "화재 감지 없음")}";
                     }
                 });
             }
         }
-    }
 
-    public class SensorData
-    {
-        public string CO2 { get; set; }
-        public string Temperature { get; set; }
-        public string Flame { get; set; }
+        public class SensorData
+        {
+            public string CO2 { get; set; }
+            public string Temperature { get; set; }
+            public string Flame { get; set; }
+        }
     }
 }
